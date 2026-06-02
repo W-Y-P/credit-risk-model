@@ -2,15 +2,17 @@
 
 [![skills.sh](https://skills.sh/b/W-Y-P/credit-risk-model)](https://skills.sh/W-Y-P/credit-risk-model)
 
-Reusable agent skill for credit-risk model development, validation, reporting, and strategy analysis.
+Reusable, model-agnostic agent skill for credit-risk model development, validation, reporting, and strategy analysis.
 
-This repository contains a Codex / skills.sh skill, not a standalone Python package. Install it into an agent environment, then ask the agent to use `$credit-risk-model` when developing scorecards, logistic regression models, LightGBM/XGBoost models, or other credit-risk models.
+This repository contains a skills.sh-compatible AI-agent workflow, not a standalone Python package. It is written as plain Markdown instructions, so it can be used by Codex and by other large-model agents such as Claude, ChatGPT, Gemini, Cursor, Windsurf, GitHub Copilot Chat, or any internal LLM agent that accepts project instructions or custom system prompts.
 
 ## 中文说明
 
 ### 这是什么
 
-`credit-risk-model` 是一套面向信贷风控建模的 agent skill，用于把常见的信用风险建模流程沉淀成可复用的工作流。它适用于申请评分卡、行为评分卡、催收模型、反欺诈模型、客群筛选模型、额度/定价辅助模型等场景。
+`credit-risk-model` 是一套面向信贷风控建模的通用 AI agent skill，用于把常见的信用风险建模流程沉淀成可复用的工作流。它不是只给 Codex 使用；只要你的大模型工具支持读取项目指令、系统提示词、自定义规则或 Markdown workflow，都可以复用这套建模规范。
+
+它适用于申请评分卡、行为评分卡、催收模型、反欺诈模型、客群筛选模型、额度/定价辅助模型等场景。
 
 它会先明确建模需求，再按模型类型选择合适的建模路线。评分卡会走 WOE 分箱、IV、相关性、逐步回归、VIF、评分转换和报告验证流程；LightGBM、XGBoost、CatBoost、随机森林等树模型会走树模型应有的数据切分、早停、重要性/SHAP、过拟合诊断、调参和稳定性验证流程。
 
@@ -28,6 +30,7 @@ This repository contains a Codex / skills.sh skill, not a standalone Python pack
 - **异常月份只标注不默认过滤**：样本量过小、坏样本过少或月份异常时，会在报告中标注原因，默认不直接删除。
 - **可输出策略候选**：建模完成后会询问是否需要策略。若需要，会列出召回率大于 1%、lift 大于 3 的高风险规则候选。
 - **面向交付报告**：不是只输出 notebook 指标，而是要求形成模型开发验证报告、模型对比表、评分卡表、分箱表、lift 表、PSI 表和策略表。
+- **跨模型工具可复用**：核心内容是通用 Markdown workflow，可用于 Codex、Claude、ChatGPT、Gemini、Cursor、Windsurf、Copilot 或企业内部大模型 agent。
 
 ### 安装
 
@@ -35,10 +38,38 @@ This repository contains a Codex / skills.sh skill, not a standalone Python pack
 npx skills add W-Y-P/credit-risk-model
 ```
 
-安装后，在 Codex 或支持 skills.sh 的 agent 中直接点名使用：
+安装后，在支持 skills.sh 的 agent 中直接点名使用：
 
 ```text
 使用 $credit-risk-model 开发一版申请评分卡，OOT 选择最近完整月，验证集从剩余样本分层抽样，输出模型开发验证报告。
+```
+
+### 多模型/多 Agent 使用方式
+
+这套 skill 有两种使用方式。
+
+**方式一：支持 skills.sh 的 agent**
+
+直接安装后，用 `$credit-risk-model` 触发：
+
+```text
+使用 $credit-risk-model 训练并验证一版信用风险模型，先确认建模目标、模型类型、Y 定义、样本切分和报告模板。
+```
+
+**方式二：不支持 skills.sh 的大模型工具**
+
+打开 [SKILL.md](./SKILL.md)，把全文作为项目规则、系统提示词、custom instructions、workspace rules 或团队建模规范提供给模型。然后用自然语言要求模型“按 credit-risk-model workflow 执行”。
+
+适用方式示例：
+
+- ChatGPT / Claude / Gemini：把 `SKILL.md` 放入自定义指令、项目说明或当前对话上下文。
+- Cursor / Windsurf / GitHub Copilot Chat：把 `SKILL.md` 放入项目规则、workspace rules 或仓库文档，并在任务里引用。
+- 企业内部 LLM agent：把 `SKILL.md` 作为系统提示词片段或风控建模 SOP。
+
+通用提示词：
+
+```text
+请按 credit-risk-model workflow 执行本次建模任务。先明确建模目标、模型类型、Y 值、样本切分、参数调节、衍生特征和报告要求；第一版模型完成后诊断过拟合、欠拟合、稳定性和数据泄漏，再继续优化并输出模型开发验证报告。
 ```
 
 ### 怎么使用
@@ -101,7 +132,9 @@ skill 会在动手前尽量确认这些信息。如果你已经在任务里说�
 
 ### What It Is
 
-`credit-risk-model` is an agent skill for end-to-end credit-risk modeling. It helps an agent clarify the modeling request, choose the right workflow, train and validate models, compare candidates, produce scorecards, and generate model development and validation reports.
+`credit-risk-model` is a model-agnostic AI-agent skill for end-to-end credit-risk modeling. It helps an agent clarify the modeling request, choose the right workflow, train and validate models, compare candidates, produce scorecards, and generate model development and validation reports.
+
+It is not limited to Codex. Because the workflow is plain Markdown, it can also be used with Claude, ChatGPT, Gemini, Cursor, Windsurf, GitHub Copilot Chat, or internal enterprise LLM agents that support project instructions, custom prompts, or repository rules.
 
 It is designed for application risk, behavior risk, collection prioritization, anti-fraud review, customer selection, limit/pricing support, and other credit-risk use cases.
 
@@ -117,6 +150,7 @@ It is designed for application risk, behavior risk, collection prioritization, a
 - **Leakage audit for overly strong results**: checks post-outcome fields, future aggregation, date leakage, duplicate keys, target-window overlap, and train/validation/OOT contamination.
 - **Optional institution/channel checks**: only runs institution/channel sample, missingness, IV, PSI, or OOS analysis when such fields exist.
 - **Report-oriented deliverables**: produces artifacts that can be audited, reproduced, and turned into a model development validation report.
+- **Portable across LLM tools**: the core workflow is Markdown-based and can be reused in Codex, Claude, ChatGPT, Gemini, Cursor, Windsurf, Copilot, or an internal model agent.
 
 ### Install
 
@@ -124,10 +158,38 @@ It is designed for application risk, behavior risk, collection prioritization, a
 npx skills add W-Y-P/credit-risk-model
 ```
 
-Then call the skill explicitly in a supported agent:
+Then call the skill explicitly in a skills.sh-compatible agent:
 
 ```text
 Use $credit-risk-model to train and validate an application scorecard. Use the latest complete month as OOT, stratified validation from the remaining sample, and generate a model development validation report.
+```
+
+### Multi-Agent / Multi-Model Usage
+
+There are two practical ways to use this skill.
+
+**Option 1: skills.sh-compatible agents**
+
+Install the skill and trigger it with `$credit-risk-model`:
+
+```text
+Use $credit-risk-model to train and validate a credit-risk model. First clarify the modeling goal, model family, target definition, sample split, report template, and strategy needs.
+```
+
+**Option 2: Other LLM tools**
+
+Open [SKILL.md](./SKILL.md) and provide it as project instructions, custom instructions, workspace rules, a system-prompt fragment, or an internal modeling SOP. Then ask the model to follow the `credit-risk-model` workflow.
+
+Examples:
+
+- ChatGPT / Claude / Gemini: paste or attach `SKILL.md` in project instructions, custom instructions, or the current conversation context.
+- Cursor / Windsurf / GitHub Copilot Chat: place `SKILL.md` in repository rules, workspace rules, or project documentation and reference it in the task.
+- Internal enterprise LLM agents: load `SKILL.md` as a system-prompt fragment or credit-risk modeling SOP.
+
+Generic prompt:
+
+```text
+Follow the credit-risk-model workflow for this modeling task. First clarify the modeling goal, model family, target definition, sample split, tuning depth, derived-feature requirements, and report constraints. After the first model version, diagnose overfitting, underfitting, stability, and leakage before optimizing and producing the final model development validation report.
 ```
 
 ### Usage Examples
