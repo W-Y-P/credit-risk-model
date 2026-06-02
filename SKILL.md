@@ -7,7 +7,7 @@ description: End-to-end credit risk modeling workflow for application, behavior,
 
 ## Modeling Intake
 
-Start by clarifying the modeling request before touching code or training. Ask only the unanswered items; if the user already specified something, restate it and move on.
+Hard gate: the first response after this skill is triggered must clarify the modeling request before any modeling, feature selection, tuning, or report generation. Do not skip this intake because the user gave a broad modeling task. Start with a concise question block covering every item below; if the user already specified an item, restate it as a confirmation and ask only for correction. Do not train or finalize assumptions until the user answers, unless the user explicitly says to proceed with defaults after seeing the intake block.
 
 1. Modeling goal:
    - Reject or rank bad customers / high-risk applicants.
@@ -40,6 +40,7 @@ Start by clarifying the modeling request before touching code or training. Ask o
 7. Report and constraints:
    - Ask whether the user has a report template. If yes, match it; if no, use the default credit-risk validation report.
    - Ask only if ambiguous: final report language should follow the user's language. Chinese user requests get Chinese reports and sheet names; English user requests get English reports and sheet names.
+   - For scorecard models, confirm that the model validation report should use the exact `平台贷贷前申请模型开发验证报告_061559.xlsx` format unless the user explicitly requests another template.
    - Ask for any mandatory variables, forbidden variables, policy constraints, monotonicity constraints, score bands, approval-rate targets, or deployment limitations.
 8. Post-modeling strategy:
    - After model validation is complete, ask whether the user needs strategy suggestions, cutoff tables, or policy rules.
@@ -47,9 +48,9 @@ Start by clarifying the modeling request before touching code or training. Ask o
 
 ## Core Workflow
 
-1. Complete the modeling intake and document the chosen assumptions.
+1. Complete the mandatory modeling intake and document the chosen assumptions. If the first user request is underspecified, ask the intake questions first; do not jump directly into code, data exploration, or model training.
 2. Define the target and observation point explicitly: application date, performance window, bad definition, exclusions, sample source, and deduplication key. Never infer a target from column names without checking the available data dictionary, labels, or user instructions.
-3. If the user provides a prior model report, scorecard sheet, development-flow diagram, or report template, use it as reference for naming, score bands, and report format. If not provided, use the default credit-risk development workflow and report structure.
+3. If the user provides a prior model report, scorecard sheet, development-flow diagram, or report template, use it as reference for naming, score bands, and report format. For scorecard model validation reports, `平台贷贷前申请模型开发验证报告_061559.xlsx` is the default required format when available; match it exactly. If not provided, use the default credit-risk development workflow and report structure for non-scorecard reports or draft scorecard outputs only.
 4. Split samples before feature selection:
    - Use the user-specified OOT month or time window exactly.
    - Draw validation from the remaining non-OOT sample, stratified by target when random validation is requested.
@@ -233,13 +234,21 @@ Create reproducible artifacts:
 - `variable_removal_log.csv`: every removal round, threshold, removed variable, and reason.
 - `lift` / performance tables for deciles or fixed bands.
 - Final report workbook or document. Use the user-provided template when available; otherwise use the default credit-risk model development validation report structure.
-- A model validation report sheet or workbook section. For scorecard models, include a full model validation report modeled after `平台贷贷前申请模型开发验证报告_061559.xlsx` when that template is available in the workspace. For tree models, include a lighter model validation report using the same style but only the sections that apply to tree-model development.
+- A model validation report sheet or workbook section. For scorecard models, the final model validation report must use the exact format of `平台贷贷前申请模型开发验证报告_061559.xlsx` when that template is available in the workspace. For tree models, include a lighter model validation report using the same style but only the sections that apply to tree-model development.
 
 For final Excel deliverables, consolidate all report tables and Excel-like outputs into one workbook with clearly named sheets, such as summary, sample split, model comparison, validation metrics, selected features, bins, lift, PSI, row scores, feature screening, removal log, and strategy. Keep standalone CSV files only as reproducible intermediate artifacts or machine-readable exports unless the user explicitly asks for separate Excel files.
 
 When writing an Excel report from a provided template, preserve existing sheet order, drawings, images, and labels where possible. When no template is provided, create a default report covering sample definition, feature screening, binning, model comparison, validation, score distribution, lift, PSI, and strategy suggestions. Include a data-cleaning and variable-screening appendix when the optional cleaning pipeline is run: summary, abnormal-month marks, missing/value-rate details, IV details, PSI details, Null Importance results, high-correlation removals, and the variable removal log. Verify by reopening the workbook/document and checking key sections, row counts, formulas/headers, and images.
 
-Default scorecard validation report sections, matching the spirit of `平台贷贷前申请模型开发验证报告_061559.xlsx`:
+Scorecard validation report template lock:
+
+- Treat `平台贷贷前申请模型开发验证报告_061559.xlsx` as the required scorecard report template, not merely an example.
+- Use the template workbook as the starting file whenever possible. Preserve sheet names, sheet order, section order, titles, merged cells, row/column layout, column widths, fonts, borders, fills, formulas, drawings/images, fixed score bands, table headers, and terminology.
+- Fill the existing sections and tables with the new model results. Do not reorder, rename, or redesign the scorecard validation report unless the user explicitly approves a format change.
+- If additional audit tables are useful but do not exist in the template, put them in clearly named appendix sheets or machine-readable artifacts without changing the required template structure.
+- If the template is not available in the workspace, ask the user to provide it or confirm that a non-template draft is acceptable before producing the final scorecard model validation report.
+
+Default scorecard validation report sections, following the exact `平台贷贷前申请模型开发验证报告_061559.xlsx` structure when the template is available:
 
 - Development flow / model development process.
 - Sample data introduction: product/sample source, observation point, performance window, Y definition, exclusions, split, train/validation/OOT sample counts and bad rates.
