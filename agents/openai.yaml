@@ -1,0 +1,4 @@
+interface:
+  display_name: "Credit Risk Model"
+  short_description: "Credit risk modeling and validation workflow"
+  default_prompt: "Use $credit-risk-model to train and validate a credit risk model with scorecard and machine-learning comparison."
