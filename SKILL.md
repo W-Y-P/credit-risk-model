@@ -39,6 +39,7 @@ Start by clarifying the modeling request before touching code or training. Ask o
    - If yes, ask whether WOE combinations and decision-tree combination features are acceptable, or whether only raw deployable formulas are allowed.
 7. Report and constraints:
    - Ask whether the user has a report template. If yes, match it; if no, use the default credit-risk validation report.
+   - Ask only if ambiguous: final report language should follow the user's language. Chinese user requests get Chinese reports and sheet names; English user requests get English reports and sheet names.
    - Ask for any mandatory variables, forbidden variables, policy constraints, monotonicity constraints, score bands, approval-rate targets, or deployment limitations.
 8. Post-modeling strategy:
    - After model validation is complete, ask whether the user needs strategy suggestions, cutoff tables, or policy rules.
@@ -60,6 +61,12 @@ Start by clarifying the modeling request before touching code or training. Ask o
 8. If performance is unusually strong, investigate data leakage before optimizing or finalizing.
 9. Generate a final report in the same structure as the prior report when one exists. Report both model development and validation, not just a notebook-style metric dump.
 10. Ask whether a strategy layer is needed after model validation. Do not assume the model report alone is the final business deliverable.
+
+## Output Language
+
+- Match the user's language in final documents, workbooks, sheet names, chart labels, and narrative summaries unless they explicitly request another language.
+- If the user writes in Chinese, produce Chinese report text and Chinese sheet names. If the user writes in English, produce English report text and English sheet names.
+- Keep technical identifiers such as raw variable names, file names, SQL expressions, model names, and metric abbreviations unchanged when translating them would reduce traceability.
 
 ## Data And Split Discipline
 
@@ -226,8 +233,35 @@ Create reproducible artifacts:
 - `variable_removal_log.csv`: every removal round, threshold, removed variable, and reason.
 - `lift` / performance tables for deciles or fixed bands.
 - Final report workbook or document. Use the user-provided template when available; otherwise use the default credit-risk model development validation report structure.
+- A model validation report sheet or workbook section. For scorecard models, include a full model validation report modeled after `平台贷贷前申请模型开发验证报告_061559.xlsx` when that template is available in the workspace. For tree models, include a lighter model validation report using the same style but only the sections that apply to tree-model development.
+
+For final Excel deliverables, consolidate all report tables and Excel-like outputs into one workbook with clearly named sheets, such as summary, sample split, model comparison, validation metrics, selected features, bins, lift, PSI, row scores, feature screening, removal log, and strategy. Keep standalone CSV files only as reproducible intermediate artifacts or machine-readable exports unless the user explicitly asks for separate Excel files.
 
 When writing an Excel report from a provided template, preserve existing sheet order, drawings, images, and labels where possible. When no template is provided, create a default report covering sample definition, feature screening, binning, model comparison, validation, score distribution, lift, PSI, and strategy suggestions. Include a data-cleaning and variable-screening appendix when the optional cleaning pipeline is run: summary, abnormal-month marks, missing/value-rate details, IV details, PSI details, Null Importance results, high-correlation removals, and the variable removal log. Verify by reopening the workbook/document and checking key sections, row counts, formulas/headers, and images.
+
+Default scorecard validation report sections, matching the spirit of `平台贷贷前申请模型开发验证报告_061559.xlsx`:
+
+- Development flow / model development process.
+- Sample data introduction: product/sample source, observation point, performance window, Y definition, exclusions, split, train/validation/OOT sample counts and bad rates.
+- Feature data set: data source, feature name, business label, feature type, formula/remarks.
+- Feature screening: LightGBM or other first-pass importance, IV, binned IV, composite rank, keep/remove reason.
+- Correlation screening and multicollinearity checks.
+- Decision-tree binning candidates and manual binning final choices.
+- Scorecard: base score, odds, PDO, A/B constants, variable bins, WOE, coefficient, points, formula/deployment rule.
+- Model score and validation: train/validation/OOT AUC, KS, PSI, gaps, calibration where relevant, variable/bin PSI.
+- Full-sample and OOT score distribution/lift tables, including cumulative good/bad counts, cumulative rate, cumulative lift, and KS where applicable.
+- Stress testing when feasible: define stress scenarios, feature perturbation logic, score/KS/approval-rate impact, and conclusion.
+
+Default tree-model validation report sections:
+
+- Development flow / model development process.
+- Sample data introduction: Y definition, observation point, split, exclusions, train/validation/OOT sample counts and bad rates.
+- Feature data set and preprocessing: raw features, categorical handling, missing/special-value handling, derived features, target encoding or leakage controls.
+- Feature screening and model selection: baseline, tuned tree models, ensemble comparison, validation/OOT AUC, KS, lift, calibration, and selected reason.
+- Tree-model explanation: gain/split importance and SHAP or equivalent explanation when available; do not include scorecard WOE coefficient/points sections unless a scorecard challenger is also built.
+- Model score and validation: probability distribution, score/decile lift, PSI, validation-vs-OOT stability, overfit/leakage audit.
+- OOT / OOS sample performance and key subgroup performance when time/channel/institution fields exist.
+- Stress testing or sensitivity checks when feasible: perturb important raw features or score distributions, and report metric/approval-rate impact.
 
 ## Strategy And Policy Output
 
