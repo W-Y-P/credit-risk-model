@@ -20,16 +20,15 @@ This repository contains a skills.sh-compatible AI-agent workflow, not a standal
 
 - **先问清建模目标**：拒绝坏客户、挑选好客户、风险定价、额度、催收优先级、欺诈审核或其它目标。
 - **支持多类模型**：评分卡、WOE 逻辑回归、普通逻辑/线性回归、LightGBM、XGBoost、CatBoost、随机森林，以及 champion/challenger 对比。
-- **时间外验证优先**：OOT 默认选择最近的完整月份；验证集可以选择临近月，也可以从非 OOT 样本中分层抽样。
-- **特征重要性更稳健**：重要特征按 LightGBM 重要性、原始 IV、分箱后 IV 加权综合排序，默认权重为 `0.4 / 0.3 / 0.3`。
+- **特征重要性更稳健**：重要特征按 LightGBM 重要性、原始 IV、分箱后 IV 加权综合排序。
 - **评分卡流程贴近实战**：变量统计、分箱、WOE 趋势、IV、相关性、逐步回归、系数方向、VIF、评分卡分数、KS/AUC/PSI/lift、评分分布和策略建议。
-- **树模型流程不过度套评分卡**：对 LightGBM/XGBoost 等模型使用树模型专属的缺失值处理、早停、特征重要性、过拟合/欠拟合诊断、正则化、采样比例、树深度和叶子数优化。
+- **树模型专属流程**：对 LightGBM/XGBoost 等模型使用树模型专属的缺失值处理、早停、特征重要性、过拟合/欠拟合诊断、正则化、采样比例、树深度和叶子数优化。
 - **衍生变量覆盖面广**：差值、比值、均值、占比、相对差、窗口趋势、log/截尾、缺失标识、WOE 组合、2 到 3 层决策树组合特征、客群/渠道交互特征。
 - **过强结果会查泄漏**：如果 KS/AUC/lift 异常好，会要求检查目标泄漏、时间泄漏、贷后字段、未来聚合、重复样本、训练/验证/OOT 污染等问题。
-- **可选机构/渠道稳定性检查**：只有在存在机构或渠道字段时，才补充机构/渠道维度的样本、坏账率、缺失率、IV、PSI 或 OOS 验证。
-- **异常月份只标注不默认过滤**：样本量过小、坏样本过少或月份异常时，会在报告中标注原因，默认不直接删除。
-- **可输出策略候选**：建模完成后会询问是否需要策略。若需要，会列出召回率大于 1%、lift 大于 3 的高风险规则候选。
-- **面向交付报告**：不是只输出 notebook 指标，而是要求形成模型开发验证报告、模型对比表、评分卡表、分箱表、lift 表、PSI 表和策略表。
+- **机构/渠道稳定性检查**：存在机构或渠道字段时，补充机构/渠道维度的样本、坏账率、缺失率、IV、PSI 或 OOS 验证。
+- **异常月份标注**：样本量过小、坏样本过少或月份异常时，会在报告中标注原因。
+- **可输出策略候选**：建模完成后会询问是否需要策略。若需要，会列出召回率大于 1%、lift 大于 3 的高风险规则候选。除了风控模型，还能帮你搞定风控策略。
+- **生成标准的交付文档**：形成模型开发验证报告、模型对比表、评分卡表、分箱表、lift 表、PSI 表和策略表。
 - **跨模型工具可复用**：核心内容是通用 Markdown workflow，可用于 Codex、Claude、ChatGPT、Gemini、Cursor、Windsurf、Copilot 或企业内部大模型 agent。
 
 ### 安装
@@ -142,14 +141,15 @@ It is designed for application risk, behavior risk, collection prioritization, a
 
 - **Modeling intake first**: clarifies the business goal, model family, target definition, sample split, tuning depth, derived features, report template, and strategy needs.
 - **Multiple model families**: supports scorecards, WOE logistic regression, logistic/linear regression, LightGBM, XGBoost, CatBoost, random forest, and champion/challenger comparison.
-- **Time-aware validation**: defaults OOT to the nearest/latest complete month; validation can be a nearby month or a stratified random split from non-OOT data.
-- **Robust feature ranking**: combines LightGBM importance, raw IV, and binned IV with default weights `0.4 / 0.3 / 0.3`.
+- **Robust feature ranking**: combines LightGBM importance, raw IV, and binned IV.
 - **Practical scorecard workflow**: variable statistics, WOE binning, IV, correlation filtering, stepwise logistic regression, coefficient direction checks, VIF, score scaling, validation, score distribution, and strategy suggestions.
-- **Tree-model-specific workflow**: uses early stopping, feature importance/SHAP, calibration checks, overfitting/underfitting diagnosis, and targeted tuning for LightGBM/XGBoost-style models.
+- **Dedicated tree-model workflow**: uses early stopping, feature importance/SHAP, calibration checks, overfitting/underfitting diagnosis, and targeted tuning for LightGBM/XGBoost-style models.
 - **Broad derived-feature search**: differences, ratios, means, shares, relative gaps, trend features, transformations, missing indicators, WOE combinations, 2-to-3-level tree combination features, and group/channel interactions.
 - **Leakage audit for overly strong results**: checks post-outcome fields, future aggregation, date leakage, duplicate keys, target-window overlap, and train/validation/OOT contamination.
-- **Optional institution/channel checks**: only runs institution/channel sample, missingness, IV, PSI, or OOS analysis when such fields exist.
-- **Report-oriented deliverables**: produces artifacts that can be audited, reproduced, and turned into a model development validation report.
+- **Institution/channel stability checks**: when institution or channel fields exist, adds sample, bad-rate, missingness, IV, PSI, or OOS analysis by institution/channel.
+- **Abnormal-month marking**: flags months with small sample size, too few bad samples, or unusual patterns in the report.
+- **Strategy candidates**: after model validation, can list high-risk rule candidates with recall greater than 1% and lift greater than 3; beyond risk models, it also helps with risk strategy design.
+- **Standard delivery documents**: generates model development validation reports, model comparison tables, scorecards, binning tables, lift tables, PSI tables, and strategy tables.
 - **Portable across LLM tools**: the core workflow is Markdown-based and can be reused in Codex, Claude, ChatGPT, Gemini, Cursor, Windsurf, Copilot, or an internal model agent.
 
 ### Install
