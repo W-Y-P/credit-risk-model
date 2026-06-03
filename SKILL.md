@@ -40,7 +40,7 @@ Hard gate: the first response after this skill is triggered must clarify the mod
 7. Report and constraints:
    - Ask whether the user has a report template. If yes, match it; if no, use the default credit-risk validation report.
    - Ask only if ambiguous: final report language should follow the user's language. Chinese user requests get Chinese reports and sheet names; English user requests get English reports and sheet names.
-   - For scorecard models, confirm that the model validation report should use the exact `平台贷贷前申请模型开发验证报告_061559.xlsx` format unless the user explicitly requests another template.
+   - For scorecard models, confirm that the model validation report should use the exact scorecard model development validation report template format unless the user explicitly requests another template.
    - Ask for any mandatory variables, forbidden variables, policy constraints, monotonicity constraints, score bands, approval-rate targets, or deployment limitations.
 8. Post-modeling strategy:
    - After model validation is complete, ask whether the user needs strategy suggestions, cutoff tables, or policy rules.
@@ -50,7 +50,7 @@ Hard gate: the first response after this skill is triggered must clarify the mod
 
 1. Complete the mandatory modeling intake and document the chosen assumptions. If the first user request is underspecified, ask the intake questions first; do not jump directly into code, data exploration, or model training.
 2. Define the target and observation point explicitly: application date, performance window, bad definition, exclusions, sample source, and deduplication key. Never infer a target from column names without checking the available data dictionary, labels, or user instructions.
-3. If the user provides a prior model report, scorecard sheet, development-flow diagram, or report template, use it as reference for naming, score bands, and report format. For scorecard model validation reports, `平台贷贷前申请模型开发验证报告_061559.xlsx` is the default required format when available; match it exactly. If not provided, use the default credit-risk development workflow and report structure for non-scorecard reports or draft scorecard outputs only.
+3. If the user provides a prior model report, scorecard sheet, development-flow diagram, or report template, use it as reference for naming, score bands, and report format. For scorecard model validation reports, the scorecard model development validation report template is the default required format when available; match it exactly. If not provided, use the default credit-risk development workflow and report structure for non-scorecard reports or draft scorecard outputs only.
 4. Split samples before feature selection:
    - Use the user-specified OOT month or time window exactly.
    - Draw validation from the remaining non-OOT sample, stratified by target when random validation is requested.
@@ -108,7 +108,7 @@ Run a lightweight data-cleaning and variable-screening pipeline before modeling 
 
 ## Derived Variables
 
-- Generate a broad library of derived variables where data and deployment constraints allow:
+- When the user says to use defaults, treat derived variables as enabled. Generate a broad library of derived variables where data and deployment constraints allow:
   - Raw arithmetic: difference, ratio, reverse ratio, share, relative difference, mean, sum, min/max, absolute difference.
   - Window and trend features: short-window / long-window ratio, monthly average, monthly acceleration, recent-vs-history gap.
   - Transformations: log, clipping/winsorization, percentile rank, missing/special-value indicators.
@@ -116,8 +116,9 @@ Run a lightweight data-cleaning and variable-screening pipeline before modeling 
   - Tree combinations: 2-to-3-level decision-tree leaf features or compact rule buckets built from 2-3 strong variables.
   - Group interactions: same-family credit, query, utilization, overdue, balance, and enterprise-age combinations.
 - Track deployability for every derived variable. Prefer simpler raw formulas when several candidates have similar validation/OOT performance, but do not exclude WOE combinations or tree combinations by default.
-- Require at least one derived variable only when the user asks for it. The derived variable must improve validation KS versus the current model, not just pass univariate screening.
+- Let derived variables participate in screening and model selection by default. Require a derived variable in the final model only when it improves validation/OOT performance, stability, or materially improves interpretability; otherwise report that derived variables were generated and rejected.
 - Record derived formulas in a deployment-ready form using source features, not only generated display names.
+- Add a derived-variable audit table or sheet to the final deliverable whenever derived variables are generated, including formula, parent variables, deployability, screening status, IV, and final-selection status.
 
 ## Default Parameters
 
@@ -234,7 +235,7 @@ Create reproducible artifacts:
 - `variable_removal_log.csv`: every removal round, threshold, removed variable, and reason.
 - `lift` / performance tables for deciles or fixed bands.
 - Final report workbook or document. Use the user-provided template when available; otherwise use the default credit-risk model development validation report structure.
-- A model validation report sheet or workbook section. For scorecard models, the final model validation report must use the exact format of `平台贷贷前申请模型开发验证报告_061559.xlsx` when that template is available in the workspace. For tree models, include a lighter model validation report using the same style but only the sections that apply to tree-model development.
+- A model validation report sheet or workbook section. For scorecard models, the final model validation report must use the exact format of the scorecard model development validation report template when that template is available in the workspace. For tree models, include a lighter model validation report using the same style but only the sections that apply to tree-model development.
 
 For final Excel deliverables, consolidate all report tables and Excel-like outputs into one workbook with clearly named sheets, such as summary, sample split, model comparison, validation metrics, selected features, bins, lift, PSI, row scores, feature screening, removal log, and strategy. Keep standalone CSV files only as reproducible intermediate artifacts or machine-readable exports unless the user explicitly asks for separate Excel files.
 
@@ -242,13 +243,13 @@ When writing an Excel report from a provided template, preserve existing sheet o
 
 Scorecard validation report template lock:
 
-- Treat `平台贷贷前申请模型开发验证报告_061559.xlsx` as the required scorecard report template, not merely an example.
+- Treat the scorecard model development validation report template as the required scorecard report template, not merely an example.
 - Use the template workbook as the starting file whenever possible. Preserve sheet names, sheet order, section order, titles, merged cells, row/column layout, column widths, fonts, borders, fills, formulas, drawings/images, fixed score bands, table headers, and terminology.
 - Fill the existing sections and tables with the new model results. Do not reorder, rename, or redesign the scorecard validation report unless the user explicitly approves a format change.
 - If additional audit tables are useful but do not exist in the template, put them in clearly named appendix sheets or machine-readable artifacts without changing the required template structure.
 - If the template is not available in the workspace, ask the user to provide it or confirm that a non-template draft is acceptable before producing the final scorecard model validation report.
 
-Default scorecard validation report sections, following the exact `平台贷贷前申请模型开发验证报告_061559.xlsx` structure when the template is available:
+Default scorecard validation report sections, following the exact scorecard model development validation report template structure when the template is available:
 
 - Development flow / model development process.
 - Sample data introduction: product/sample source, observation point, performance window, Y definition, exclusions, split, train/validation/OOT sample counts and bad rates.
