@@ -2,30 +2,9 @@
 
 [![skills.sh](https://skills.sh/b/W-Y-P/credit-risk-model)](https://skills.sh/W-Y-P/credit-risk-model)
 
-Turn AI agents into credit-risk modeling assistants: scorecards, LightGBM/XGBoost, feature engineering, validation reports, and risk strategy in one reusable skill.
+Reusable, model-agnostic agent skill for credit-risk model development, validation, reporting, and strategy analysis.
 
 This repository contains a skills.sh-compatible AI-agent workflow, not a standalone Python package. It is written as plain Markdown instructions, so it can be used by Codex and by other large-model agents such as Claude, ChatGPT, Gemini, Cursor, Windsurf, GitHub Copilot Chat, or any internal LLM agent that accepts project instructions or custom system prompts.
-
-## Quick Install
-
-```bash
-npx skills add W-Y-P/credit-risk-model
-```
-
-Then ask your agent:
-
-```text
-Use $credit-risk-model to build and validate a credit-risk model. First clarify the modeling goal, target definition, sample split, model family, derived-feature requirements, report template, and strategy needs.
-```
-
-## Why Install This Skill
-
-- Stops vibe-coding-style modeling by forcing an intake step before training.
-- Supports scorecards, WOE logistic regression, LightGBM, XGBoost, CatBoost, random forest, and champion/challenger comparison.
-- Includes practical risk-model checks: IV/WOE, binning, KS, AUC, PSI, lift, leakage audit, overfit/underfit diagnosis, and OOT stability.
-- Generates deployable derived features and records formulas, parent variables, screening status, and selection reasons.
-- Produces standard model development validation workbooks instead of loose notebook outputs.
-- Goes beyond modeling: can produce cutoff analysis, high-lift strategy candidates, approval/review/reject bands, and policy tradeoff tables.
 
 ## 中文说明
 
