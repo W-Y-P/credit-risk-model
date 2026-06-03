@@ -3,8 +3,8 @@
     "notGrouped": "bottom",
     "groupings": [
         {
-            "title": "Risk Modeling",
-            "description": "Credit risk modeling, validation, and strategy workflows.",
+            "title": "Credit Risk Modeling",
+            "description": "Scorecards, LightGBM/XGBoost validation, model development reports, and risk strategy workflows.",
             "skills": [
                 "credit-risk-model"
             ]
