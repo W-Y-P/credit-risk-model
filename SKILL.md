@@ -239,6 +239,15 @@ Create reproducible artifacts:
 
 For final Excel deliverables, consolidate all report tables and Excel-like outputs into one workbook with clearly named sheets, such as summary, sample split, model comparison, validation metrics, selected features, bins, lift, PSI, row scores, feature screening, removal log, and strategy. Keep standalone CSV files only as reproducible intermediate artifacts or machine-readable exports unless the user explicitly asks for separate Excel files.
 
+For unified Excel reports, make the first sheet a polished workbook landing page, not a dense model-detail dump. The first sheet should act as a directory and reading guide with:
+
+- A concise title, model purpose, target definition, model family, selected cutoff, and key validation metrics.
+- A table of contents listing every worksheet, what it contains, and what the reader should check there.
+- A short reading order or executive note for business/model-validation reviewers.
+- Professional visual hierarchy: title band, summary cards or compact KPI rows, section headers, restrained fills, readable column widths, wrapping, borders, and no visually awkward blank bands.
+
+Move detailed validation content from the first sheet into the corresponding downstream sheets. If a detail shown on the landing page has no natural downstream sheet, create or update a named sheet for it before finalizing. Common required downstream sheets include sample data introduction, feature data set, derived-variable audit, feature screening, selected scorecard variables, correlation screening, binning, scorecard points, model score/validation, lift, score distribution, PSI/CV, row-level scores, variable removal log, stress testing, and submission/output tables.
+
 When writing an Excel report from a provided template, preserve existing sheet order, drawings, images, and labels where possible. When no template is provided, create a default report covering sample definition, feature screening, binning, model comparison, validation, score distribution, lift, PSI, and strategy suggestions. Include a data-cleaning and variable-screening appendix when the optional cleaning pipeline is run: summary, abnormal-month marks, missing/value-rate details, IV details, PSI details, Null Importance results, high-correlation removals, and the variable removal log. Verify by reopening the workbook/document and checking key sections, row counts, formulas/headers, and images.
 
 Scorecard validation report template lock:
@@ -303,6 +312,9 @@ Before finalizing, check:
 - High-lift feature-derived strategy candidates with recall >1% and lift >3 are listed when strategy output is requested.
 - Score formula matches the template, especially intercept handling.
 - Sample performance uses the requested 10-bin or fixed-band mode.
+- For unified Excel reports, the first sheet is a polished landing page with workbook directory, key summary, and reading guide; it is not a long-form validation-detail sheet.
+- Every detailed item referenced on the landing page has a corresponding downstream worksheet or section. Add missing sheets such as selected variables, derived-variable audit, model validation metrics, PSI/CV, or submission output instead of leaving details only on the landing page.
+- Render the first sheet visually before final delivery. Fix obvious layout issues such as cramped text, clipped headers, awkward blank color bands, unreadable fills, or table headers extending beyond the intended directory area.
 - Workbook/report opens cleanly and key tables contain the expected rows.
 
 ## Communication Style
